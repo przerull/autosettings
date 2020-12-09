@@ -80,7 +80,6 @@ class TestPathFinderAbsoluteConfigFilepath(TestCase):
         def side_effect(filepath):
             helper_method = finder._get_full_filepath
             system_path = helper_method('system_config_directory', 'test.ini')
-            print(filepath, system_path)
             return filepath == system_path
         mock_isfile.side_effect = side_effect
         result = finder.absolute_config_filepath('test.ini')
