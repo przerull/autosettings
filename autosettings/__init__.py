@@ -11,24 +11,33 @@ class PathFinder:
                  config_directory_name: str = "python_autosettings",
                  default_folder_method: str = "user_config_directory",
                  method_resolution_order: typing.Tuple[str] = DEFAULT_MRO):
-        self._validate_default_folder_method(default_folder_method)
+        self._ensure_callable_attribute_exists(default_folder_method)
         self._validate_mro(method_resolution_order)
         self.method_resolution_order = method_resolution_order
         self.default_folder_method = default_folder_method
         self.config_directory_name = config_directory_name
 
-    def _validate_default_folder_method(self, default_folder_method: str):
-        if not hasattr(self, default_folder_method):
-            raise AttributeError() #TODO get decent error message
-        elif not callable(getattr(self, default_folder_method)):
-            raise TypeError() #TODO get decent error message
+    def _ensure_callable_attribute_exists(self, attribute_name: str):
+        if not hasattr(self, attribute_name):
+            raise self._get_attribute_error(attribute_name)
+        elif not callable(getattr(self, attribute_name)):
+            raise self._get_not_callable_error(attribute_name)
+
+    def _get_attribute_error(self, attribute_name: str):
+        template = "'{}' object has not attribute '{}'"
+        classname = self.__class__.__name__
+        message = template.format(classname, attribute_name)
+        return AttributeError(message)
+
+    def _get_not_callable_error(self, attribute_name: str):
+        template = "'{}' is not a callable member of the '{}' class"
+        classname = self.__class__.__name__
+        message = template.format(attribute_name, classname)
+        return TypeError(message)
 
     def _validate_mro(self, mro: typing.Tuple[str]):
         for method in mro:
-            if not hasattr(self, method):
-                raise AttributeError() #TODO get decent error message
-            elif not callable(getattr(self, method)):
-                raise TypeError() #TODO get decent error message
+            self._ensure_callable_attribute_exists(method)
 
     def absolute_config_filepath(self, filename: str):
         """Returns the absolute path of the configuration file based on:
