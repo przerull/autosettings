@@ -13,9 +13,12 @@ class PathFinder:
                  method_resolution_order: typing.Tuple[str] = DEFAULT_MRO):
         self._ensure_callable_attribute_exists(default_folder_method)
         self._validate_mro(method_resolution_order)
-        self.method_resolution_order = method_resolution_order
-        self.default_folder_method = default_folder_method
-        self.config_directory_name = config_directory_name
+        # The following attributes are "private" to discourage users from
+        # modifying them after the constructor is called. @property methods
+        # are provided to grant read-only access
+        self._method_resolution_order = method_resolution_order
+        self._default_folder_method = default_folder_method
+        self._config_directory_name = config_directory_name
 
     def _ensure_callable_attribute_exists(self, attribute_name: str):
         if not hasattr(self, attribute_name):
@@ -38,6 +41,18 @@ class PathFinder:
     def _validate_mro(self, mro: typing.Tuple[str]):
         for method in mro:
             self._ensure_callable_attribute_exists(method)
+
+    @property
+    def default_folder_method(self):
+        return self._default_folder_method
+
+    @property
+    def method_resolution_order(self):
+        return self._method_resolution_order
+
+    @property
+    def config_directory_name(self):
+        return self._config_directory_name
 
     def absolute_config_filepath(self, filename: str):
         """Returns the absolute path of the configuration file based on:
