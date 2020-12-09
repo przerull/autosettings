@@ -14,8 +14,8 @@ if '-q' in sys.argv:
     report_file = open(os.devnull, 'w')
 else:
     report_file = None
-suite = unittest.TestLoader().discover('tests', '*.py', '.')
 cov.start()
+suite = unittest.TestLoader().discover('tests', '*.py', '.')
 result = unittest.TextTestRunner().run(suite)
 cov.stop()
 number_errors = len(result.errors) + len(result.failures)
