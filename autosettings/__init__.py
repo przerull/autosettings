@@ -63,7 +63,15 @@ class PathFinder:
             - PathFinder.RESOLUTION_ORDER
             - PathFinder.DEFAULT_DIRECTORY
         """
-        pass
+        for method_name in self.method_resolution_order:
+            filepath = self._get_full_filepath(method_name, filename)
+            if os.path.isfile(filepath):
+                return filepath
+        return self._get_full_filepath(self.default_folder_method, filename)
+
+    def _get_full_filepath(self, method_name: str, filename: str):
+        method = getattr(self, method_name)
+        return os.path.join(method(), filename)
 
     def user_config_directory(self) -> str:
         """Returns $HOME/.config on linux and %AppData%\Roaming on Windows."""
@@ -79,19 +87,23 @@ class PathFinder:
 
     def system_config_directory(self) -> str:
         """Returns /etc on linux and %AppData%\Roaming on Windows."""
-        pass
+        if sys.platform.startswith('linux'):
+            return os.path.join('/etc', self.config_directory_name)
+        else: # pragma: no cover
+            raise self._not_implemented_in_system("system_config_directory")
 
     def dunder_main_directory(self) -> str:
         """Returns the absolute path of the directory containing the python
         script evoked directly by the interpreter (where __main__ is).
         """
-        pass
+        return os.path.abspath(os.path.dirname(sys.argv[0]))
 
 
 
 class AutoSettings:
     def __init__(self,
                  filename: str,
+                 config_directory_name: typing.Optional[str] = None,
                  pathfinder: typing.Optional[PathFinder] = None,
                  autosave: bool = True):
         self.filename = filename
