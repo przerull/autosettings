@@ -2,17 +2,25 @@ import typing
 import sys
 import os
 
-DEFAULT_MRO = (
+DEFAULT_METHOD_RESOLUTION_ORDER = (
     "dunder_main_directory",
     "user_config_directory",
     "system_config_directory",
 )
 
+DEFAULT_FOLDER_METHOD = "user_config_directory"
+
+OptionalStrTuple = typing.Optional[typing.Tuple[str]]
+
 class PathFinder:
     def __init__(self,
                  config_directory_name: str = "python_autosettings",
-                 default_folder_method: str = "user_config_directory",
-                 method_resolution_order: typing.Tuple[str] = DEFAULT_MRO):
+                 default_folder_method: typing.Optional[str] = None,
+                 method_resolution_order: OptionalStrTuple = None):
+        if default_folder_method is None:
+            default_folder_method = DEFAULT_FOLDER_METHOD
+        if method_resolution_order is None:
+            method_resolution_order = DEFAULT_METHOD_RESOLUTION_ORDER
         self._ensure_callable_attribute_exists(default_folder_method)
         self._validate_mro(method_resolution_order)
         # The following attributes are "private" to discourage users from
