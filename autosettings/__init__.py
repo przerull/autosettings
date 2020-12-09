@@ -1,4 +1,6 @@
 import typing
+import sys
+import os
 
 DEFAULT_MRO = (
     "dunder_main_directory",
@@ -63,15 +65,23 @@ class PathFinder:
         """
         pass
 
-    def user_config_directory() -> str:
+    def user_config_directory(self) -> str:
         """Returns $HOME/.config on linux and %AppData%\Roaming on Windows."""
-        pass
+        user_dir = os.path.abspath(os.path.expanduser('~'))
+        if sys.platform.startswith('linux'):
+            return os.path.join(user_dir, '.config', self.config_directory_name)
+        else: # pragma: no cover
+            raise self._not_implemented_in_system("user_config_directory")
 
-    def system_config_directory() -> str:
+    def _not_implemented_in_system(self, method_name: str): # pragma: no cover
+        template = "method '{}' not implimented for system: {}"
+        return NotImplementedError(template.format(method_name, sys.platform))
+
+    def system_config_directory(self) -> str:
         """Returns /etc on linux and %AppData%\Roaming on Windows."""
         pass
 
-    def dunder_main_directory() -> str:
+    def dunder_main_directory(self) -> str:
         """Returns the absolute path of the directory containing the python
         script evoked directly by the interpreter (where __main__ is).
         """

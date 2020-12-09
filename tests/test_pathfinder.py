@@ -2,6 +2,8 @@ from unittest import TestCase
 
 from autosettings import PathFinder
 
+import os
+
 class TestPathFinderConstructor(TestCase):
     def test_default_parameters(self):
         result = PathFinder()
@@ -36,3 +38,12 @@ class TestPathFinderConstructor(TestCase):
             PathFinder(method_resolution_order=("__dict__", ))
         expected_message = "'__dict__' is not a callable member of the 'PathFinder' class"
         self.assertEqual(str(err.exception), expected_message)
+
+class TestPathFinderMethods(TestCase):
+    def test_get_user_config_directory(self):
+        finder = PathFinder()
+        result = finder.user_config_directory()
+        expected = os.path.join(
+            os.path.abspath(os.path.expanduser('~')),
+            '.config/python_autosettings')
+        self.assertEqual(result, expected)
