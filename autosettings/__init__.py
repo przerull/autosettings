@@ -26,7 +26,7 @@ class PathFinder:
         # The following attributes are "private" to discourage users from
         # modifying them after the constructor is called. @property methods
         # are provided to grant read-only access
-        self._method_resolution_order = method_resolution_order
+        self._store_method_resolution_order(method_resolution_order)
         self._default_folder_method = default_folder_method
         self._config_directory_name = config_directory_name
 
@@ -51,6 +51,11 @@ class PathFinder:
     def _validate_mro(self, mro: typing.Tuple[str]):
         for method in mro:
             self._ensure_callable_attribute_exists(method)
+
+    def _store_method_resolution_order(self, method_resolution_order: str):
+        self._method_resolution_order = []
+        for method in method_resolution_order:
+            self._method_resolution_order.append(method)
 
     @property
     def default_folder_method(self):
@@ -125,6 +130,9 @@ class AutoSettings:
         pass
 
     def __setitem__(self):
+        pass
+
+    def save(self):
         pass
 
 
