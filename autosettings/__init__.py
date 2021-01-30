@@ -2,6 +2,60 @@ import typing
 import sys
 import os
 
+
+
+
+
+
+class Schema:
+    _fields = dict()
+    def __init__(self, file_like_object, autosave=False):
+        pass
+
+    def to_dictionary(self):
+        result = dict()
+        for name, descriptor in self._fields.items():
+            result[name] = getattr(self, name)
+        return result
+
+
+class _BaseField:
+    def __set_name__(self, instance, name):
+        instance._fields[name] = self
+        self._name = name
+
+    def __get__(self, instance, owner=None):
+        return self._value
+
+    def __set__(self, instance, value):
+        self.validate(value)
+        self._value = value
+
+    def __init__(self, default=None):
+        self.validate(default)
+        self._value = default
+
+    def validate(self, value):
+        pass
+
+
+def _assert_is_type_or_none(value, some_type):
+    if value is not None and not isinstance(value, some_type):
+        message = 'The value provided "{}" is not of the type {}'
+        raise TypeError(message.format(value, some_type))
+
+
+class IntegerField(_BaseField):
+    def validate(self, value):
+        _assert_is_type_or_none(value, int)
+
+
+class StringField(_BaseField):
+    def validate(self, value):
+        _assert_is_type_or_none(value, str)
+
+
+
 DEFAULT_METHOD_RESOLUTION_ORDER = (
     "dunder_main_directory",
     "user_config_directory",
@@ -119,18 +173,21 @@ class AutoSettings:
                  config_directory_name: typing.Optional[str] = None,
                  pathfinder: typing.Optional[PathFinder] = None,
                  autosave: bool = True):
-        self.filename = filename
-        self.pathfinder = pathfinder
-        pass
+        self._filename = filename
+        self._pathfinder = pathfinder
+        self._data: typing.dict[str, str] = dict()
 
-    def __getitem__(self):
-        pass
+    def __getitem__(self, key: str):
+        return self._data[key]
 
-    def get(self, key: str, default: str):
-        pass
+    def get(self, key: str, default: typing.Optional[str] = None):
+        if key not in self._data:
+            self[key] = default
+        return self[key]
 
-    def __setitem__(self):
-        pass
+
+    def __setitem__(self, key: str, value: str):
+        self._data[key] = value
 
     def save(self):
         pass
